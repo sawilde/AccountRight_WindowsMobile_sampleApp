@@ -1,13 +1,9 @@
 ﻿namespace MYOB.Sample
 {
-    /// <summary>
-    /// Enter your application client id and secret here
-    /// https://my.myob.com.au/Bd/pages/DevAppList.aspx
-    /// </summary>
     public class Configuration
     {
-        public const string ClientId = "<<clientid>>";
-        public const string ClientSecret = "<<clientsecret>>";
+        public const string ClientId = "zbtutq2f9pzw3w5w38amsvrs";
+        public const string ClientSecret = "K3rUCNfPRYrd6GsGBmu84Pwu";
         public const string RequestUri = "http://desktop";
     }
 }
