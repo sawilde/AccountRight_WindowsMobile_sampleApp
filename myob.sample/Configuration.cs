@@ -2,6 +2,7 @@
 {
     /// <summary>
     /// Enter your application client id and secret here
+    /// 
     /// https://my.myob.com.au/Bd/pages/DevAppList.aspx
     /// </summary>
     public class Configuration
