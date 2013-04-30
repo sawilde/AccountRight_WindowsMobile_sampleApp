@@ -30,6 +30,7 @@ namespace MYOB.Sample.Communication
             var request = (HttpWebRequest)WebRequest.Create(_accountRightBaseUri);
             request.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", _oauth.AccessToken);
             request.Headers["x-myobapi-key"] = Configuration.ClientId;
+            request.Headers["Accept-Encoding"] = "gzip";
             request.BeginGetResponse(HandleResponseCallback<RequestContext<string, CompanyFile[]>, string, CompanyFile[]>,
                 new RequestContext<string, CompanyFile[]>
                 {
@@ -53,6 +54,7 @@ namespace MYOB.Sample.Communication
             request.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", _oauth.AccessToken);
             request.Headers["x-myobapi-key"] = Configuration.ClientId;
             request.Headers["x-myobapi-cftoken"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Format("{0}:{1}", username, password)));
+            request.Headers["Accept-Encoding"] = "gzip";
             request.BeginGetResponse(HandleResponseCallback<RequestContext<string, PagedCollection<Account>>, string, PagedCollection<Account>>,
                 new RequestContext<string, PagedCollection<Account>>
                 {

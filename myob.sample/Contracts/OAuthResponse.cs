@@ -11,7 +11,15 @@ namespace MYOB.Sample.Contracts
     {
         private DateTime _receivedTime;
 
-        public void MarkReceivedTime()
+        /// <summary>
+        /// http://msdn.microsoft.com/en-au/library/system.runtime.serialization.ondeserializingattribute.aspx
+        /// </summary>
+        /// <remarks>
+        /// This method needs to be public in a windows phone aplication
+        /// </remarks>
+        /// <param name="context"></param>
+        [OnDeserializing]
+        public void OnDeserializing(StreamingContext context)
         {
             _receivedTime = DateTime.Now;
         }

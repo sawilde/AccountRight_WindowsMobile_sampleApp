@@ -43,8 +43,16 @@ namespace MYOB.Sample
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
-        { 
-            if (_viewModel.ShowBrowser)
+        {
+            if (OAuthResponse != null)
+            {
+                _viewModel.ShowBrowser = false;
+                if (_viewModel.CompanyFiles.Count == 0)
+                {
+                    Refresh_OnClick(this, null);
+                }
+            }
+            else if (_viewModel.ShowBrowser)
             {
                 _viewModel.CompanyFiles.Clear();
                 OAuthLogin.Navigate(_authorizeUri);                
