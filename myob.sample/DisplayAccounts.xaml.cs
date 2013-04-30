@@ -29,9 +29,26 @@ namespace MYOB.Sample
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            base.OnNavigatedTo(e);
+            if (ViewModel.CompanyFile == null) // resume from tombstoning
+            {
+                ViewModel.CompanyFile = new CompanyFileViewModel() { CompanyFile = (CompanyFile)State["CompanyFile"] };
+                ViewModel.CompanyFile.Authentication.Add(new CompanyFileViewModel.CompanyFileAuthenticationViewModel());
+                ViewModel.CompanyFile.Authentication[0].Username = (string)State["Username"];
+                ViewModel.CompanyFile.Authentication[0].Password = (string)State["Password"];
+            }
+
             BeginOauthRequest();
             ViewModel.IsLoading = true;
-            base.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            State["CompanyFile"] = ViewModel.CompanyFile.CompanyFile;
+            State["Username"] = ViewModel.CompanyFile.Authentication[0].Username;
+            State["Password"] = ViewModel.CompanyFile.Authentication[0].Password;
+
+            base.OnNavigatingFrom(e);
         }
 
         private void BeginOauthRequest()

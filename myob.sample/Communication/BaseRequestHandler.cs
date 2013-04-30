@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using SharpCompress.Compressor;
+using SharpCompress.Compressor.Deflate;
 
 namespace MYOB.Sample.Communication
 {
@@ -28,13 +30,14 @@ namespace MYOB.Sample.Communication
                 var response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    var responseStream = response.GetResponseStream();
-                    using (var reader = new StreamReader(responseStream))
+                    if (response.Headers["Content-Encoding"] != null && response.Headers["Content-Encoding"].Contains("gzip"))
                     {
-                        var data = reader.ReadToEnd();
-                        Debug.WriteLine(data);
-                        var serializer = new DataContractJsonSerializer(typeof(TResp));
-                        var entity = (TResp)serializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(data)));
+                        var entity = ExtractCompressedEntity<TResp>(response);
+                        requestData.OnSuccess(entity);
+                    }
+                    else
+                    {
+                        var entity = ExtractEntity<TResp>(response);
                         requestData.OnSuccess(entity);
                     }
                 }
@@ -46,6 +49,27 @@ namespace MYOB.Sample.Communication
             catch (Exception ex)
             {
                 requestData.OnError();
+            }
+        }
+
+        private static TResp ExtractEntity<TResp>(HttpWebResponse response)
+        {
+            var responseStream = response.GetResponseStream();
+            using (var reader = new StreamReader(responseStream))
+            {
+                var data = reader.ReadToEnd();
+                var serializer = new DataContractJsonSerializer(typeof(TResp));
+                return (TResp)serializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(data)));
+            }
+        }
+
+        private static TResp ExtractCompressedEntity<TResp>(HttpWebResponse response)
+        {
+            var responseStream = response.GetResponseStream();
+            using (var decompress = new GZipStream(responseStream, CompressionMode.Decompress))
+            {
+                var serializer = new DataContractJsonSerializer(typeof(TResp));
+                return (TResp)serializer.ReadObject(decompress);
             }
         }
     }

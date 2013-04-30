@@ -50,16 +50,8 @@ namespace MYOB.Sample.Communication
             }
         }
 
-        private Action<OAuthResponse> _onSuccess;
-        private void OnSuccess(OAuthResponse response)
-        {
-            response.MarkReceivedTime();
-            _onSuccess(response);
-        }
-
         private void BeginRequest(Action<OAuthResponse> onSuccess, Action onError, string data)
         {
-            _onSuccess = onSuccess;
             _request.Method = "POST";
             _request.ContentType = "application/x-www-form-urlencoded";
             _request.BeginGetRequestStream(HandleRequestCallback,
@@ -67,7 +59,7 @@ namespace MYOB.Sample.Communication
                                                {
                                                    Body = data,
                                                    Request = _request,
-                                                   OnSuccess = OnSuccess,
+                                                   OnSuccess = onSuccess,
                                                    OnError = onError
                                                });
         }

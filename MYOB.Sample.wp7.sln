@@ -1,7 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyobSample", "MYOB.Sample\MYOB.Sample.csproj", "{33B26BE6-8834-4901-AB7A-7A7306F3D550}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MYOB.Sample", "MYOB.Sample\MYOB.Sample.csproj", "{33B26BE6-8834-4901-AB7A-7A7306F3D550}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6E2CFAD6-B581-4CA9-8E08-5CE497DADF0D}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
