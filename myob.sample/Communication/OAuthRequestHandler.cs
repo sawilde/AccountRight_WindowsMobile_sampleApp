@@ -24,7 +24,7 @@ namespace MYOB.Sample.Communication
         public void GetOAuthTokens(string code, Action<OAuthResponse> onSuccess, Action onError)
         {
             var data = string.Format("client_id={0}&client_secret={1}&redirect_uri={2}&scope=CompanyFile&code={3}&grant_type=authorization_code",
-                                     Configuration.ClientId, Configuration.ClientSecret, Configuration.RequestUri, code);
+                                     Configuration.ClientId, Configuration.ClientSecret, Configuration.RedirectUrl, code);
 
             BeginRequest(onSuccess, onError, data);
         }

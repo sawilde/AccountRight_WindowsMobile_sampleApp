@@ -9,6 +9,6 @@
     {
         public const string ClientId = "<<clientid>>";
         public const string ClientSecret = "<<clientsecret>>";
-        public const string RequestUri = "http://desktop";
+        public const string RedirectUrl = "http://desktop";
     }
 }

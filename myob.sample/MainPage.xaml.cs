@@ -24,7 +24,7 @@ namespace MYOB.Sample
     {
         private readonly Uri _authorizeUri = new Uri(
             string.Format("https://secure.myob.com/oauth2/account/authorize?client_id={0}&redirect_uri={1}&scope=CompanyFile&response_type=code",
-                Configuration.ClientId, Uri.EscapeDataString(Configuration.RequestUri)));
+                Configuration.ClientId, Uri.EscapeDataString(Configuration.RedirectUrl)));
 
         private readonly Uri _logoffUri = new Uri("https://secure.myob.com/oauth2/account/logoff");
         private readonly Uri _loginUri = new Uri("https://secure.myob.com/oauth2/account/login");
