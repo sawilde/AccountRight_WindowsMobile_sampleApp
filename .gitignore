@@ -1,0 +1,8 @@
+Bin
+obj
+/myob.sample/*.sap
+/*.DotSettings
+/*.suo
+/myob.sample/*.user
+/packages/*
+!packages/repositories.config
