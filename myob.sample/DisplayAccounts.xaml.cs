@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using MYOB.Sample.Annotations;
-using MYOB.Sample.Communication;
-using MYOB.Sample.Contracts;
+using MYOB.AccountRight.SDK;
+using MYOB.AccountRight.SDK.Contracts;
+using MYOB.AccountRight.SDK.Contracts.Version2.Contact;
+using MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger;
+using MYOB.Sample.UserControls;
 using MYOB.Sample.ViewModels;
 
 namespace MYOB.Sample
@@ -23,23 +19,25 @@ namespace MYOB.Sample
         public DisplayAccounts()
         {
             InitializeComponent();
-            ViewModel = new DisplayAccountsViewModel();
+            ViewModel = new DisplayAccountsViewModel(this);
             DataContext = ViewModel;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (ViewModel.CompanyFile == null) // resume from tombstoning
+            if (ViewModel.CompanyFile == null && State.Keys.Contains("CompanyFile")) // resuming from tombstoning
             {
                 ViewModel.CompanyFile = new CompanyFileViewModel() { CompanyFile = (CompanyFile)State["CompanyFile"] };
-                ViewModel.CompanyFile.Authentication.Add(new CompanyFileViewModel.CompanyFileAuthenticationViewModel());
+                ViewModel.CompanyFile.Authentication.Add(new CompanyFileAuthenticationViewModel());
                 ViewModel.CompanyFile.Authentication[0].Username = (string)State["Username"];
                 ViewModel.CompanyFile.Authentication[0].Password = (string)State["Password"];
             }
-
-            BeginOauthRequest();
-            ViewModel.IsLoading = true;
+            
+            if (ViewModel.Accounts.Count == 0)
+            {
+                ViewModel.FetchData(ShowError);
+            }
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -51,54 +49,37 @@ namespace MYOB.Sample
             base.OnNavigatingFrom(e);
         }
 
-        private void BeginOauthRequest()
-        {
-            var oauthRequest = new OAuthRequestHandler();
-            oauthRequest.RenewOAuthTokens(OAuthResponse, HandleOauthResponse, ShowError);
-        }
 
-        private void HandleOauthResponse(OAuthResponse oauth)
+        private static void ShowError(Exception ex)
         {
-            OAuthResponse = oauth;
-            Dispatcher.BeginInvoke(() =>
-            {
-                ViewModel.IsLoading = true;
-            });
-
-            var request = new ApiRequestHandler(OAuthResponse);
-            request.GetAccounts(ViewModel.CompanyFile.CompanyFile.Id,
-                                ViewModel.CompanyFile.Authentication[0].Username,
-                                ViewModel.CompanyFile.Authentication[0].Password, DisplayCompanyAccounts, ShowError);
-        }
-
-        private void DisplayCompanyAccounts(PagedCollection<Account> accounts)
-        {
-            Dispatcher.BeginInvoke(() =>
-                {
-                    ViewModel.Accounts.Clear();
-                    foreach (var account in accounts.Items.Where(a => !a.IsHeader))
-                    {
-                        ViewModel.Accounts.Add(account);
-                    }
-                    ViewModel.IsLoading = false;
-                });
-        }
-
-        private void ShowError()
-        {
-            Dispatcher.BeginInvoke(() =>
-            {
-                MessageBox.Show("An Error Occured: Try Again");
-                ViewModel.IsLoading = false;
-            });
+            MessageBox.Show(string.Format("An Error Occured: {0}", ex.Message));
         }
 
         private void Refresh_OnClick(object sender, EventArgs e)
         {
             if (ViewModel.IsLoading) return;
-            ViewModel.IsLoading = true;
-
-            BeginOauthRequest();
+            ViewModel.FetchData(ShowError);
         }
+
+        private CustomerViewModel _selectedCustomer;
+        private void ListCustomers_OnCustomerClicked(object sender, CustomerClickedEventArgs e)
+        {
+            if (e.Customer == null) return;
+            _selectedCustomer = e.Customer;
+            NavigationService.Navigate(new Uri("/ViewCustomer.xaml", UriKind.Relative));
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            if (e.Content is ViewCustomer)
+            {
+                var view = e.Content as ViewCustomer;
+                view.ViewModel.CompanyFile = _selectedCustomer.CompanyFile;
+                view.ViewModel.Customer = _selectedCustomer.Customer;
+                view.ViewModel.Credentials = _selectedCustomer.Credentials;
+            }
+            base.OnNavigatedFrom(e);
+        }
+
     }
 }

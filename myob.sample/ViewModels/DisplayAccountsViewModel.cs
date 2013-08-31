@@ -1,29 +1,45 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using MYOB.AccountRight.SDK;
+using MYOB.AccountRight.SDK.Contracts.Version2;
+using MYOB.AccountRight.SDK.Contracts.Version2.Contact;
+using MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger;
+using MYOB.AccountRight.SDK.Services.Contact;
+using MYOB.AccountRight.SDK.Services.GeneralLedger;
 using MYOB.Sample.Annotations;
-using MYOB.Sample.Contracts;
 
 namespace MYOB.Sample.ViewModels
 {
     public class DisplayAccountsViewModel : INotifyPropertyChanged
     {
-        public DisplayAccountsViewModel()
+        private readonly IOAuthKeyService _keyService;
+
+        public DisplayAccountsViewModel(IOAuthKeyService keyService)
         {
+            _keyService = keyService;
             Accounts = new ObservableCollection<Account>();
+            Customers = new ObservableCollection<CustomerViewModel>();
+            RawCustomers = new List<Contact>();
         }
 
-        private CompanyFileViewModel _companyFile;
+        private CompanyFileViewModel _companyFileModel;
         private bool _isLoading;
         public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<Account> Accounts { get; private set; }
+        public ObservableCollection<CustomerViewModel> Customers { get; private set; }
+        public List<Contact> RawCustomers { get; private set; }
 
         public CompanyFileViewModel CompanyFile
         {
-            get { return _companyFile; }
+            get { return _companyFileModel; }
             set
             {
-                if (Equals(value, _companyFile)) return;
-                _companyFile = value;
+                if (Equals(value, _companyFileModel)) return;
+                _companyFileModel = value;
                 OnPropertyChanged("CompanyFile");
             }
         }
@@ -44,6 +60,52 @@ namespace MYOB.Sample.ViewModels
         {
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void FetchData(Action<Exception> onError)
+        {
+            IsLoading = true;
+            var service = new AccountService(new ApiConfiguration(), null, _keyService);
+            var cService = new CustomerService(new ApiConfiguration(), null, _keyService);
+
+            Task.WhenAll(new[]
+                {
+                    service.GetRangeAsync(CompanyFile.CompanyFile, null, CompanyFile.Authentication[0])
+                        .ContinueWith(t => DisplayAccounts(t.Result.Items), TaskScheduler.FromCurrentSynchronizationContext()),
+                    cService.GetRangeAsync(CompanyFile.CompanyFile, null, CompanyFile.Authentication[0])
+                        .ContinueWith(t => DisplayCustomers(t.Result.Items), TaskScheduler.FromCurrentSynchronizationContext())
+                })
+                .ContinueWith(t =>
+                    {
+                        IsLoading = false;
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public void DisplayCustomers(Customer[] collection)
+        {
+            Customers.Clear();
+            RawCustomers.Clear();
+            RawCustomers.AddRange(collection);
+            foreach (var contact in collection.Maybe(_ => _, new Contact[0]))
+            {
+                var customer = new CustomerViewModel(_keyService)
+                    {
+                        Customer = contact,
+                        CompanyFile = _companyFileModel.CompanyFile,
+                        Credentials = new CompanyFileCredentials(CompanyFile.Authentication[0].Username, CompanyFile.Authentication[0].Password)
+                    };
+                Customers.Add(customer);
+                customer.FetchPicture();
+            }
+        }
+
+        public void DisplayAccounts(Account[] collection)
+        {
+            Accounts.Clear();
+            foreach (var account in collection.Maybe(_ => _, new Account[0]).Where(a => !a.IsHeader))
+            {
+                Accounts.Add(account);
+            }
         }
     }
 }

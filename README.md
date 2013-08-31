@@ -35,3 +35,9 @@ Now that we are in possesion of an **OAuth Token** we can use this token to make
 ### Recommendations ###
 
 We recommend that when accessing the API that you attempt to use compression in your requests to improve performance and to reduce the data delivered to your clients; this is especially important on mobile devices where bandwidth and data download limits apply. Use the header *Accept-Encoding* set to *gzip* in your requests and **check** for the header *Content-Encoding* set to *gzip* in the response. 
+
+### Attributions ###
+
+# Man Sillhouette # 
+
+http://commons.wikimedia.org/wiki/File%3AMan_silhouette-gray.svg.png - By Yvwv (Own work) [GFDL (http://www.gnu.org/copyleft/fdl.html), CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0/) or CC-BY-SA-2.5-2.0-1.0 (http://creativecommons.org/licenses/by-sa/2.5-2.0-1.0)], via Wikimedia Commons

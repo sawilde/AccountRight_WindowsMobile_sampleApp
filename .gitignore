@@ -6,3 +6,4 @@ obj
 /myob.sample/*.user
 /packages/*
 !packages/repositories.config
+SDK
