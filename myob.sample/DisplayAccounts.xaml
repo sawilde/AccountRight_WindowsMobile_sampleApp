@@ -9,6 +9,8 @@
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:designTime="clr-namespace:MYOB.Sample.DesignTime" xmlns:converters="clr-namespace:MYOB.Sample.Converters"
     xmlns:sample="clr-namespace:MYOB.Sample"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:userControls="clr-namespace:MYOB.Sample.UserControls"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -58,34 +60,28 @@
             </Grid.RowDefinitions>
 
             <!--TitlePanel contains the name of the application and page title-->
-            <StackPanel Grid.Row="0" Margin="12,17,0,28">
+            <StackPanel Grid.Row="0" >
                 <TextBlock Text="{Binding CompanyFile.CompanyFile.Name}" Style="{StaticResource PhoneTextNormalStyle}"/>
-                <TextBlock Text="accounts" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
             </StackPanel>
-
-            <ListBox Grid.Row="1" ItemsSource="{Binding Accounts}" Margin="10,0,10,0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Name}" 
-                                       FontSize="{StaticResource PhoneFontSizeLarge}" 
-                                       Foreground="{StaticResource PhoneForegroundBrush}"/>
-                            <TextBlock Text="{Binding CurrentAccountBalance, StringFormat='${0:0.00}'}" 
-                                       FontSize="{StaticResource PhoneFontSizeNormal}" 
-                                       Foreground="{StaticResource PhoneSubtleBrush}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            
+            <controls:Pivot Grid.Row="1">
+                <controls:PivotItem Header="accounts">
+                    <userControls:ListAccounts DataContext="{Binding}" />
+                </controls:PivotItem>
+                <controls:PivotItem Header="customers">
+                    <userControls:ListCustomers DataContext="{Binding}" CustomerClicked="ListCustomers_OnCustomerClicked" />
+                </controls:PivotItem>
+            </controls:Pivot>
         </Grid>
     </Grid>
     <phone:PhoneApplicationPage.ApplicationBar>
-        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized">
-            <shell:ApplicationBar.MenuItems>
-                <shell:ApplicationBarMenuItem Text="Refresh"
-                                              IsEnabled="True"
-                                              Click="Refresh_OnClick"/>
-            </shell:ApplicationBar.MenuItems>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Default">
+            <shell:ApplicationBar.Buttons>
+                <shell:ApplicationBarIconButton Text="Refresh" 
+                                                IsEnabled="True" 
+                                                IconUri="/Images/appbar.refresh.rest.png" 
+                                                Click="Refresh_OnClick" />
+            </shell:ApplicationBar.Buttons>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 </sample:SharedPhoneApplicationPage>

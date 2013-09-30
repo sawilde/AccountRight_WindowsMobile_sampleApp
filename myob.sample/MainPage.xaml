@@ -100,13 +100,18 @@
                             <toolkit:ExpanderView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical">
-                                        <TextBlock Text="Username" FontSize="{StaticResource PhoneFontSizeLarge}" Foreground="{StaticResource PhoneSubtleBrush}"/>
-                                        <TextBox Text="{Binding Username, Mode=TwoWay}" IsReadOnly="False"/>
-                                        <TextBlock Text="Password" FontSize="{StaticResource PhoneFontSizeLarge}" Foreground="{StaticResource PhoneSubtleBrush}"/>
-                                        <TextBox Text="{Binding Password, Mode=TwoWay}" IsReadOnly="False"/>
-                                        <Button Click="CompanyFileLogin_OnClick">
-                                            <TextBlock Text="Login"/>
-                                        </Button>
+                                        <StackPanel Orientation="Vertical" Visibility="{Binding CanAuthenticate, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock Text="Username" FontSize="{StaticResource PhoneFontSizeLarge}" Foreground="{StaticResource PhoneSubtleBrush}"/>
+                                            <TextBox Text="{Binding Username, Mode=TwoWay}" IsReadOnly="False"/>
+                                            <TextBlock Text="Password" FontSize="{StaticResource PhoneFontSizeLarge}" Foreground="{StaticResource PhoneSubtleBrush}"/>
+                                            <TextBox Text="{Binding Password, Mode=TwoWay}" IsReadOnly="False"/>
+                                            <Button Click="CompanyFileLogin_OnClick">
+                                                <TextBlock Text="Login"/>
+                                            </Button>
+                                        </StackPanel>
+                                        <TextBlock Text="This version of the company file is not supported" TextWrapping="Wrap" 
+                                                   FontSize="{StaticResource PhoneFontSizeLarge}" Foreground="{StaticResource PhoneSubtleBrush}"
+                                                   Visibility="{Binding CanAuthenticate, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </toolkit:ExpanderView.ItemTemplate>
@@ -118,14 +123,17 @@
     </Grid>
     
     <phone:PhoneApplicationPage.ApplicationBar>
-        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized">
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Default">
+            <shell:ApplicationBar.Buttons>
+                <shell:ApplicationBarIconButton Text="Refresh" 
+                                                IsEnabled="True" 
+                                                IconUri="/Images/appbar.refresh.rest.png" 
+                                                Click="Refresh_OnClick" />
+            </shell:ApplicationBar.Buttons>
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="Logoff"
                                               IsEnabled="True"
                                               Click="Logoff_OnClick"/>
-                <shell:ApplicationBarMenuItem Text="Refresh"
-                                              IsEnabled="True"
-                                              Click="Refresh_OnClick"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>

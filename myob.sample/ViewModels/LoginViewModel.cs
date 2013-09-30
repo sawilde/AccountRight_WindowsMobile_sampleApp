@@ -1,14 +1,23 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
+using MYOB.AccountRight.SDK;
+using MYOB.AccountRight.SDK.Communication;
+using MYOB.AccountRight.SDK.Contracts;
+using MYOB.AccountRight.SDK.Services;
 using MYOB.Sample.Annotations;
 
 namespace MYOB.Sample.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
-        public LoginViewModel()
+        private readonly IOAuthKeyService _keyService;
+
+        public LoginViewModel(IOAuthKeyService keyService)
         {
+            _keyService = keyService;
             _showBrowser = true;
             CompanyFiles = new ObservableCollection<CompanyFileViewModel>();
         }
@@ -37,6 +46,34 @@ namespace MYOB.Sample.ViewModels
                 _isLoading = value;
                 OnPropertyChanged("IsLoading");
             }
+        }
+
+        public void FetchCompanyFies(Action<Exception> onError)
+        {
+            CompanyFiles.Clear();
+            IsLoading = true;
+            ShowBrowser = false;
+
+            var service = new CompanyFileService(new ApiConfiguration(), new WebRequestFactory(), _keyService);
+            service.GetRangeAsync()
+                   .ContinueWith(t =>
+                       {
+                           if (t.IsFaulted)
+                           {
+                               onError(t.Exception);
+                               ShowBrowser = true;
+                               IsLoading = false;
+                           }
+                           else
+                           {
+                               CompanyFiles.Clear();
+                               foreach (var companyFile in t.Result)
+                               {
+                                   CompanyFiles.Add(new CompanyFileViewModel {CompanyFile = companyFile});
+                               }
+                               IsLoading = false;
+                           }
+                       }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         public ObservableCollection<CompanyFileViewModel> CompanyFiles { get; private set; }

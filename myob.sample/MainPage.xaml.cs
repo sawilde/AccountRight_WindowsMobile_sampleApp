@@ -12,9 +12,10 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MYOB.AccountRight.SDK.Communication;
+using MYOB.AccountRight.SDK.Contracts;
+using MYOB.AccountRight.SDK.Services;
 using MYOB.Sample.Annotations;
-using MYOB.Sample.Communication;
-using MYOB.Sample.Contracts;
 using MYOB.Sample.ViewModels;
 using GestureEventArgs = System.Windows.Input.GestureEventArgs;
 
@@ -38,13 +39,13 @@ namespace MYOB.Sample
         {
             InitializeComponent();
             OAuthLogin.Navigated += OAuthLogin_Navigated;
-            _viewModel = new LoginViewModel();
+            _viewModel = new LoginViewModel(this);
             this.DataContext = _viewModel;
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            if (OAuthResponse != null)
+            if (OAuthResponse != null && OAuthResponse.RefreshToken != null)
             {
                 _viewModel.ShowBrowser = false;
                 if (_viewModel.CompanyFiles.Count == 0)
@@ -75,6 +76,10 @@ namespace MYOB.Sample
             Debug.WriteLine(e.Uri);
             if (!string.Equals(e.Uri.ToString(), _authorizeUri.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
+                OAuthLogin.InvokeScript("eval",
+                    "var msViewportStyle = document.createElement(\"style\");" +
+                    "msViewportStyle.appendChild(document.createTextNode(\"@-ms-viewport{width:auto!important}\"));" +
+                    "document.getElementsByTagName(\"head\")[0].appendChild(msViewportStyle);");
                 if (string.Equals(e.Uri.ToString(), _loginUri.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     OAuthLogin.Navigate(_authorizeUri);
@@ -91,8 +96,12 @@ namespace MYOB.Sample
             { 
                 case "code": // we have a code
                     var code = match.Groups[2].Value;
-                    var oauthRequest = new OAuthRequestHandler();
-                    oauthRequest.GetOAuthTokens(code, HandleOauthResponse, ShowError);
+                    var service = new OAuthService(new ApiConfiguration(), new WebRequestFactory());
+                    service.GetTokens(code, (statusCode, tokens) =>
+                        {
+                            OAuthResponse = tokens;
+                            Dispatcher.BeginInvoke(() => _viewModel.FetchCompanyFies(ShowError));
+                        }, (uri, exception) => ShowError(exception));
                     break;
 
                 case "error": // user probably said "no thanks"
@@ -101,42 +110,10 @@ namespace MYOB.Sample
             }
         }
 
-        private void HandleOauthResponse(OAuthResponse oauth)
+        private void ShowError(Exception ex)
         {
-            OAuthResponse = oauth;
-            Dispatcher.BeginInvoke(() =>
-                {
-                    _viewModel.CompanyFiles.Clear();
-                    _viewModel.IsLoading = true;
-                    _viewModel.ShowBrowser = false;
-                });
-
-            var apiRequest = new ApiRequestHandler(OAuthResponse);
-            apiRequest.GetCompanyFiles(DisplayCompanyFiles, ShowError);
-        }
-
-        private void DisplayCompanyFiles(CompanyFile[] companyFiles)
-        {
-            Dispatcher.BeginInvoke(() =>
-                {
-                    _viewModel.CompanyFiles.Clear();
-                    foreach (var companyFile in companyFiles)
-                    {
-                        _viewModel.CompanyFiles.Add(new CompanyFileViewModel{CompanyFile = companyFile});
-                    }
-                    _viewModel.IsLoading = false;
-                });
-        }
-
-        private void ShowError()
-        {
-            Dispatcher.BeginInvoke(() =>
-                {
-                    MessageBox.Show("An Error Occured: Try Again");
-                    _viewModel.IsLoading = false;
-                    _viewModel.ShowBrowser = true;
-                    OAuthLogin.Navigate(_logoffUri);
-                });
+            MessageBox.Show("An Error Occured: Try Again");
+            OAuthLogin.Navigate(_logoffUri);
         }
 
         private void Logoff_OnClick(object sender, EventArgs e)
@@ -163,10 +140,8 @@ namespace MYOB.Sample
         {
             if (_viewModel.ShowBrowser) return;
             if (_viewModel.IsLoading) return;
-            _viewModel.IsLoading = true;
-
-            var oauthRequest = new OAuthRequestHandler();
-            oauthRequest.RenewOAuthTokens(OAuthResponse, HandleOauthResponse, ShowError);
+            if (OAuthResponse == null) Logoff_OnClick(this, null);
+            _viewModel.FetchCompanyFies(ShowError);
         }
     }
 }
