@@ -3,6 +3,7 @@ using MYOB.AccountRight.SDK.Contracts;
 using MYOB.AccountRight.SDK.Contracts.Version2;
 using MYOB.AccountRight.SDK.Contracts.Version2.Contact;
 using MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger;
+using MYOB.AccountRight.SDK.Contracts.Version2.Sale;
 using MYOB.Sample.ViewModels;
 
 namespace MYOB.Sample.DesignTime
@@ -38,7 +39,8 @@ namespace MYOB.Sample.DesignTime
                 });
             this.Customers.Add(new CustomerViewModel(null) { Customer = new Customer { CompanyName = "MYOB", CurrentBalance = 0, IsIndividual = false } });
             this.Customers.Add(new CustomerViewModel(null) { Customer = new Customer() { FirstName = "Shaun", LastName = "Wilde", CurrentBalance = 100.0m, IsIndividual = true } });
-
+            this.Invoices.Add(new Invoice() { BalanceDueAmount = 100m, Customer = new CustomerLink() { Name = "Fred" }, Number = "123456" });
+            this.Invoices.Add(new Invoice() { BalanceDueAmount = 100m, Customer = new CustomerLink() { Name = "Susan" }, Number = "ABCDE" });
         }
     }
 }

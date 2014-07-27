@@ -71,6 +71,9 @@
                 <controls:PivotItem Header="customers">
                     <userControls:ListCustomers DataContext="{Binding}" CustomerClicked="ListCustomers_OnCustomerClicked" />
                 </controls:PivotItem>
+                <controls:PivotItem Header="invoices">
+                    <userControls:ListInvoices DataContext="{Binding}" InvoiceClicked="ListInvoices_OnInvoiceClicked" />
+                </controls:PivotItem>
             </controls:Pivot>
         </Grid>
     </Grid>

@@ -45,7 +45,7 @@ namespace MYOB.Sample
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
-            if (OAuthResponse != null && OAuthResponse.RefreshToken != null)
+            if (OAuthResponse != null && OAuthResponse.RefreshToken != null && !OAuthResponse.HasExpired)
             {
                 _viewModel.ShowBrowser = false;
                 if (_viewModel.CompanyFiles.Count == 0)

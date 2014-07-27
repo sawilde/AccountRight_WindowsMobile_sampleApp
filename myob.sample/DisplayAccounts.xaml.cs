@@ -7,6 +7,7 @@ using MYOB.AccountRight.SDK;
 using MYOB.AccountRight.SDK.Contracts;
 using MYOB.AccountRight.SDK.Contracts.Version2.Contact;
 using MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger;
+using MYOB.AccountRight.SDK.Services.Sale;
 using MYOB.Sample.UserControls;
 using MYOB.Sample.ViewModels;
 
@@ -81,5 +82,10 @@ namespace MYOB.Sample
             base.OnNavigatedFrom(e);
         }
 
+        private void ListInvoices_OnInvoiceClicked(object sender, InvoiceClickedEventArgs e)
+        {
+            if (e.Invoice == null) return;
+            ViewModel.ShowPdf(e.Invoice);
+        }
     }
 }
