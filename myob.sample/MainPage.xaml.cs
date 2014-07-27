@@ -96,7 +96,8 @@ namespace MYOB.Sample
             { 
                 case "code": // we have a code
                     var code = match.Groups[2].Value;
-                    var service = new OAuthService(new ApiConfiguration(), new WebRequestFactory());
+                    var config = new ApiConfiguration();
+                    var service = new OAuthService(config, new WebRequestFactory(config));
                     service.GetTokens(code, (statusCode, tokens) =>
                         {
                             OAuthResponse = tokens;

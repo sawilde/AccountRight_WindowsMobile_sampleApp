@@ -53,8 +53,8 @@ namespace MYOB.Sample.ViewModels
             CompanyFiles.Clear();
             IsLoading = true;
             ShowBrowser = false;
-
-            var service = new CompanyFileService(new ApiConfiguration(), new WebRequestFactory(), _keyService);
+            var config = new ApiConfiguration();
+            var service = new CompanyFileService(config, new WebRequestFactory(config), _keyService);
             service.GetRangeAsync()
                    .ContinueWith(t =>
                        {
