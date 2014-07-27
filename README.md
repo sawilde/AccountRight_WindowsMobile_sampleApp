@@ -10,7 +10,7 @@ To demonstrate how to handle the authorisation process with the assistance of th
 
 ## Getting Started ##
 
-Before running this application on a device or emulator it is necessary to register an application (use **http://desktop** as the Redirect Url) and then amend the supplied **client_id** and **client_secret** in the [Configuration.cs](https://github.com/MYOB-Technology/AccountRight_WindowsMobile_sampleApp/blob/master/myob.sample/Configuration.cs) file.
+Before running this application on a device or emulator it is necessary to register an application (use **http://desktop** as the Redirect URL) and then amend the supplied **client_id** and **client_secret** in the [Configuration.cs](https://github.com/MYOB-Technology/AccountRight_WindowsMobile_sampleApp/blob/master/myob.sample/Configuration.cs) file.
 
 ## Code Description ##
 
@@ -22,9 +22,9 @@ This is not a full application and may require extra error handling to make it p
 
 First it is necessary to get the user to grant your application access to their data, this process eventually leads you to a stage where you will have a OAuth token that can be used to access the **AccountRight Live API** (see [http://developer.myob.com/docs/read/getting_started/Authentication](http://developer.myob.com/docs/read/getting_started/Authentication)).
 
-The sample application uses a hosted browser to extract a **code** from the returned HTML once the user has granted your application access to their data (see *OAuthLogin_Navigated* in [MainPage.xaml.cs](https://github.com/sawilde/AccountRight_WindowsMobile_sampleApp/blob/master/myob.sample/MainPage.xaml.cs).)
+The sample application uses a hosted browser to extract a **code** from the returned HTML once the user has granted your application access to their data (see *OAuthLogin_Navigated* in [MainPage.xaml.cs](https://github.com/MYOB-Technology/AccountRight_WindowsMobile_sampleApp/blob/master/myob.sample/MainPage.xaml.cs).)
 
-To make the login screen render correctly on WP8 it is necessary to inject some javascript when navigating to https://secure.myob.com/oauth2/account/authorize
+To make the login screen render correctly on WP8 it is necessary to inject some JavaScript when navigating to https://secure.myob.com/oauth2/account/authorize
 
     OAuthLogin.InvokeScript("eval",
         "var msViewportStyle = document.createElement(\"style\");" +
@@ -41,7 +41,7 @@ This is done using the [AccountRight Live API SDK](http://www.nuget.org/packages
 
 ### Step 3 ###
 
-Now that we are in possesion of an **OAuth Token** we can use this token to make requests against the **AccountRight Live API**. 
+Now that we are in possession of an **OAuth Token** we can use this token to make requests against the **AccountRight Live API**. 
 
 ### Recommendations ###
 
@@ -49,6 +49,6 @@ We recommend that when accessing the API that you attempt to use compression in 
 
 ### Attributions ###
 
-# Man Sillhouette #
+# Man Silhouette #
 
 http://commons.wikimedia.org/wiki/File%3AMan_silhouette-gray.svg.png - By Yvwv (Own work) [GFDL (http://www.gnu.org/copyleft/fdl.html), CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0/) or CC-BY-SA-2.5-2.0-1.0 (http://creativecommons.org/licenses/by-sa/2.5-2.0-1.0)], via Wikimedia Commons
